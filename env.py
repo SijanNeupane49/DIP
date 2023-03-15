@@ -11,6 +11,7 @@ from scipy import signal
 from PIL import Image
 from io import BytesIO
 from gym import spaces
+import math
 
 
 
@@ -121,6 +122,9 @@ class DoubleInvertedPendulumCartEnv(gym.Env):
         return k1, k2
 
     def _get_A_matrix(self):
+
+        #p = 1/(4 * self.cart_mass * self.pendulum_mass_1 + 3 * self.cart_mass * self.pendulum_mass_2 + math.pow(self.cart_mass,2) + self.pendulum_mass_1 * self.pendulum_mass_2)
+
         A = np.zeros((4, 4))
         A[0][2] = 1
         A[1][3] = 1
@@ -130,12 +134,28 @@ class DoubleInvertedPendulumCartEnv(gym.Env):
         A[3][0] = -self.pendulum_mass_2 * self.gravity / self.inertia_2
         A[3][1] = (self.pendulum_mass_1 + self.pendulum_mass_2) * self.gravity / self.inertia_2
         A[3][3] = -self.cart_mass * self.gravity / self.inertia_2
+
+        #A[2][0] = (-3/2) * p * (2 * math.pow(self.pendulum_mass_1,2) + 5 * self.pendulum_mass_1 * self.pendulum_mass_2 + 2 * math.pow(self.pendulum_mass_2,2)) * self.gravity
+        #A[2][1] = (3/2) * p * self.pendulum_mass_1 * self.pendulum_mass_2 * self.gravity
+        #A[2][2] = (3/2) * (p / self.pendulum_length_1) * (4 * self.cart_mass * self.pendulum_mass_1 + 8 * self.cart_mass * self.pendulum_mass_2 + 4 * self.pendulum_mass_2 * self.pendulum_mass_1 + 9 * self.pendulum_mass_1 * self.pendulum_mass_1 + 2 * math.pow(self.pendulum_mass_2, 2)) * g
+        #A[3][0] = −(9/2) * (p / self.pendulum_length_1) * (2 * self.cart_mass * self.pendulum_mass_1 + self.pendulum_mass_1 * self.pendulum_mass_2)g
+        #A[3][1] = −(9/2) * (p / self.pendulum_length_2) * (2 * self.cart_mass * self.pendulum_mass_1 + 4 * self.cart_mass * self.pendulum_mass_2 + math.pow(self.pendulum_mass_1,2) + 2 * self.pendulum_mass_2 * self.pendulum_mass_2)
+        #A[3][3] = (3/2) * (p / self.pendulum_length_2) * (math.pow(self.pendulum_mass_1,2) + 4 * self.cart_mass * self.pendulum_mass_1 + 12 * self.cart_mass * self.pendulum_mass_2 + 4 * self.pendulum_mass_1 * self.pendulum_mass_2)
+
         return A
+   
 
     def _get_B_matrix(self):
+
+        #p = 1/(4 * self.cart_mass * self.pendulum_mass_1 + 3 * self.cart_mass * self.pendulum_mass_2 + math.pow(self.cart_mass,2) + self.pendulum_mass_1 * self.pendulum_mass_2)
+        
         B = np.zeros((4, 1))
         B[2][0] = -1 / self.inertia_1
         B[3][0] = 1 / self.inertia_2
+
+        #B[2][0] = p(4 * self.pendulum_mass_1 + 3 * self.pendulum_mass_2) 
+        #B[3][0] = -(3 * p/ self.pendulum_length_2)(2 * self.pendulum_mass_1 + self.pendulum_mass_2)
+        #B[4][0] = (3 * p * self.pendulum_mass_2) / self.pendulum_length_2
         return B
 
     def _get_C_matrix(self):
